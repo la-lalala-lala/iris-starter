@@ -1,0 +1,8 @@
+{
+  "iris" : "go get -u github.com/kataras/iris",
+  "xorm": "go get github.com/go-xorm/xorm",
+  "xorm-cmd": "go get github.com/go-xorm/cmd/xorm",
+  "mysql": "github.com/go-sql-driver/mysql",
+  "securecookie": "github.com/gorilla/securecookie",
+  "mapstructure": "go get github.com/goinggo/mapstructure"
+}

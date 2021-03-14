@@ -1,0 +1,40 @@
+<!--
+1. type: 日志输出类型，有4中类型，分别是：sync，asyncloop(default)，asynctimer，adaptive
+   type=“sync”：在同一个go中处理日志消息，仅当调用日志函数时才被执行。
+   type=“asyncloop”：在单独的go中独自处理日志消息，循环从日志队列中读取日志并消费(输出到控制台或者文件)。
+   type="asynctimer"：在单独的go中独自处理日志消息，在指定时间间隔去读取日志队列消息，所以该类型还需要配置一个间隔时间(纳秒)。
+   type="adaptive"：在单独的go中独自处理日志消息，但是不是固定的每隔指定时间去读取日志消息，间隔时间与队列剩余的日志量有关，如果剩余日志量多，则间隔时间短，反之亦然
+2. minlevel: 全局最低输出日志级别
+3. maxlevel: 全局最高输出日志级别
+4. exceptions: 日志的特殊处理情况，可根据指定文件或者函数进行日志输出
+5. formatid: 输出格式标签，可以在formats中找到对应的标签
+6. console: 将日志输出到控制台
+7. splitter: 用于细分outputs日志格式，支持: file(文件), rollingfile(滚动文件), buffered(缓存到内存再输出到文件), smtp(发送日志邮件), con(网络转发)
+8. rollingfile: 滚动文件，可基于日期(type="date")或者文件大小(type="size")进行日志切割，maxsize: 单个日志文件最大size，如果设置为100M，则maxsize=100*1024*1024，maxrolls: 最大文件数量，超出的日志文件数量会被滚动删除
+9. buffered: 将日志先存在内存中，定期写入文件，适合日志并发量较大或 IO 比较紧张的场合，size:缓存大小, flushperiod:缓存时间
+10. filter: 单独处理某级别的日志
+11. formats: 日志输出格式
+-->
+<seelog levels="trace,debug,info,warn,error,critical">
+
+    <outputs formatid="main">
+        <!-- 对控制台输出的Log按级别分别用颜色显示。6种日志级别我仅分了三组颜色，如果想每个级别都用不同颜色则需要简单修改即可 -->
+        <filter levels="trace,debug,info">
+            <console formatid="colored-default"/>
+        </filter>
+        <filter levels="warn">
+            <console formatid="colored-warn"/>
+        </filter>
+         <filter levels="error,critical">
+             <console formatid="colored-error"/>
+         </filter>
+         <!-- 将日志输出到磁盘文件，按文件大小进行切割日志，单个文件最大100M，最多5个日志文件 -->
+         <rollingfile formatid="main" type="size" filename="./log/default.log" maxsize="104857600" maxrolls="5" />
+    </outputs>
+    <formats>
+         <format id="colored-default"  format="%EscM(38)%Date %Time [%LEV] %File:%Line | %Msg%n%EscM(0)"/>
+         <format id="colored-warn"  format="%EscM(33)%Date %Time [%LEV] %File:%Line | %Msg%n%EscM(0)"/>
+         <format id="colored-error"  format="%EscM(31)%Date %Time [%LEV] %File:%Line | %Msg%n%EscM(0)"/>
+         <format id="main" format="%Date %Time [%LEV] %File:%Line | %Msg%n"/>
+    </formats>
+</seelog>
